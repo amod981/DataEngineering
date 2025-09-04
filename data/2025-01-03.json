@@ -1,0 +1,38 @@
+[
+  {
+    "user_id": "u_001",
+    "email": "alice@example.com",
+    "is_active": true,
+    "score": 87,
+    "preferences": {
+      "theme": {
+        "mode": "dark",
+        "contrast": "low"
+      }
+    }
+  },
+  {
+    "user_id": "u_002",
+    "email": "bob@example.com",
+    "is_active": false,
+    "score": 73,
+    "preferences": {
+      "theme": {
+        "mode": "dark",
+        "contrast": "high"
+      }
+    }
+  },
+  {
+    "user_id": "u_003",
+    "email": "carol@example.com",
+    "is_active": true,
+    "score": 92,
+    "preferences": {
+      "theme": {
+        "mode": "dark",
+        "contrast": "medium"
+      }
+    }
+  }
+]

@@ -1,0 +1,67 @@
+{
+  "type": "struct",
+  "fields": [
+    {
+      "name": "email",
+      "type": "string",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "preferences",
+      "type": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "privacy",
+            "type": "boolean",
+            "nullable": true,
+            "metadata": {}
+          },
+          {
+            "name": "theme",
+            "type": {
+              "type": "struct",
+              "fields": [
+                {
+                  "name": "contrast",
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {}
+                },
+                {
+                  "name": "mode",
+                  "type": "string",
+                  "nullable": true,
+                  "metadata": {}
+                }
+              ]
+            },
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "score",
+      "type": "long",
+      "nullable": true,
+      "metadata": {}
+    },
+    {
+      "name": "user_id",
+      "type": "string",
+      "nullable": true,
+      "metadata": {}
+    }
+  ]
+}
