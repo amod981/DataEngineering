@@ -8,7 +8,7 @@ Let’s see this in action.
 
 Setup
 import sys
-from awsglue.transforms import \*
+from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
@@ -30,36 +30,40 @@ Every day, we receive user data. Inside preferences, there’s a subfield called
 df = spark.read.option("multiLine", True).json("s3://bucket-amod/data/2025-01-03.json")
 df.select(col("preferences.privacy")).show()
 
+
 Boom 💥
 
 AnalysisException: No such struct field privacy in theme
+
 
 Why? Let’s check the schema.
 
 When the Field Exists (2025-01-02.json)
 root
-|-- email: string (nullable = true)
-|-- is_active: boolean (nullable = true)
-|-- preferences: struct (nullable = true)
-| |-- privacy: boolean (nullable = true)
-| |-- theme: struct (nullable = true)
-| | |-- contrast: string (nullable = true)
-| | |-- mode: string (nullable = true)
-|-- score: long (nullable = true)
-|-- user_id: string (nullable = true)
+ |-- email: string (nullable = true)
+ |-- is_active: boolean (nullable = true)
+ |-- preferences: struct (nullable = true)
+ |    |-- privacy: boolean (nullable = true)
+ |    |-- theme: struct (nullable = true)
+ |    |    |-- contrast: string (nullable = true)
+ |    |    |-- mode: string (nullable = true)
+ |-- score: long (nullable = true)
+ |-- user_id: string (nullable = true)
+
 
 Everything looks great, the code works fine.
 
 When the Field Goes Missing (2025-01-03.json)
 root
-|-- email: string (nullable = true)
-|-- is_active: boolean (nullable = true)
-|-- preferences: struct (nullable = true)
-| |-- theme: struct (nullable = true)
-| | |-- contrast: string (nullable = true)
-| | |-- mode: string (nullable = true)
-|-- score: long (nullable = true)
-|-- user_id: string (nullable = true)
+ |-- email: string (nullable = true)
+ |-- is_active: boolean (nullable = true)
+ |-- preferences: struct (nullable = true)
+ |    |-- theme: struct (nullable = true)
+ |    |    |-- contrast: string (nullable = true)
+ |    |    |-- mode: string (nullable = true)
+ |-- score: long (nullable = true)
+ |-- user_id: string (nullable = true)
+
 
 Notice something? Yup — privacy packed its bags and left. Spark didn’t see it in the data, so it just shrugged and said, “Not my problem.” Meanwhile, our code crashes.
 
@@ -78,14 +82,14 @@ My Shortcut: Let Spark Do the Hard Work
 Instead of handcrafting schemas, I cheat. I write a sample JSON record that has all the fields I expect, and let Spark generate the schema for me.
 
 sample = {
-"user_id": "u_003",
-"email": "carol@example.com",
-"is_active": True,
-"score": 92,
-"preferences": {
-"theme": {"mode": "dark", "contrast": "medium"},
-"privacy": True
-}
+    "user_id": "u_003",
+    "email": "carol@example.com",
+    "is_active": True,
+    "score": 92,
+    "preferences": {
+        "theme": {"mode": "dark", "contrast": "medium"},
+        "privacy": True
+    }
 }
 
 rdd = spark.sparkContext.parallelize([json.dumps(sample)])
@@ -93,6 +97,7 @@ df = spark.read.json(rdd)
 
 schema_json = df.schema.jsonValue()
 print(json.dumps(schema_json, indent=2))
+
 
 This gives me a neat JSON schema with privacy included, without me crying over StructType definitions at midnight.
 
@@ -112,25 +117,27 @@ schema_str = obj.get()["Body"].read().decode("utf-8")
 schema = StructType.fromJson(json.loads(schema_str))
 
 df = spark.read.option("multiLine", True).json(
-"s3://bucket-amod/data/2025-01-03.json",
-schema=schema
+    "s3://bucket-amod/data/2025-01-03.json",
+    schema=schema
 )
 
 df.select(col("preferences.privacy")).show()
 df.printSchema()
 
+
 Resulting schema:
 
 root
-|-- email: string (nullable = true)
-|-- is_active: boolean (nullable = true)
-|-- preferences: struct (nullable = true)
-| |-- privacy: boolean (nullable = true)
-| |-- theme: struct (nullable = true)
-| | |-- contrast: string (nullable = true)
-| | |-- mode: string (nullable = true)
-|-- score: long (nullable = true)
-|-- user_id: string (nullable = true)
+ |-- email: string (nullable = true)
+ |-- is_active: boolean (nullable = true)
+ |-- preferences: struct (nullable = true)
+ |    |-- privacy: boolean (nullable = true)
+ |    |-- theme: struct (nullable = true)
+ |    |    |-- contrast: string (nullable = true)
+ |    |    |-- mode: string (nullable = true)
+ |-- score: long (nullable = true)
+ |-- user_id: string (nullable = true)
+
 
 Now even when privacy is missing from the data, Spark won’t complain. It just shows null. Problem solved.
 
