@@ -38,7 +38,9 @@ Every day, we receive user data. Inside `preferences`, there’s a subfield call
 df = spark.read.option("multiLine", True).json("s3://bucket-amod/data/2025-01-03.json")
 df.select(col("preferences.privacy")).show()
 ```
+
 Error:
+
 ```
 AnalysisException: No such struct field privacy in theme
 ```
@@ -195,6 +197,7 @@ print(json.dumps(schema_json, indent=2))
   ]
 }
 ```
+
 </details>
 
 ---
